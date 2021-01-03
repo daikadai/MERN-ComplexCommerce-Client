@@ -12,8 +12,37 @@ const RegisterComplete = ({ history }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    //validation
+    if(!email || !password) {
+      toast.error('Email and password is required')
+      return
+    } 
+
+    if(password.length < 6) {
+      toast.error('Password must be at least 6 characters long')
+      return 
+    }
     
-   
+   try {
+     const result = auth.signInWithEmailLink(email, window.location.href)
+     
+     if((await result).user.emailVerified) {
+       //remove user email from localstorage
+       window.localStorage.removeItem('emailForRegistration')
+       //get user id token
+       let user = auth.currentUser
+       await user.updatePassword(password)
+       const idTokenResult = await user.getIdTokenResult()
+       //redux store
+       console.log('user', user, 'idTokenResult', idTokenResult);
+       //redirect
+       history.push('/')
+     }
+   } catch (error) {
+     console.log(error);
+     toast.error(error.message)
+   }
   };
 
   const completeRegistrationForm = () => (
@@ -33,7 +62,7 @@ const RegisterComplete = ({ history }) => {
         placeholder='Enter your password'
       />
       <br/>
-      <button type='submit' className='btn btn-raised'>Register</button>
+      <button type='submit' className='btn btn-raised'>Complete Registration</button>
     </form>
   );
 

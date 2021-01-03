@@ -1,68 +1,65 @@
 import React, { useState, useEffect } from "react";
 import { auth } from "../../firebase";
-import { toast } from "react-toastify"
+import { toast } from "react-toastify";
 
 const RegisterComplete = ({ history }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    setEmail(window.localStorage.getItem('emailForRegistration'));
-  }, [])
+    setEmail(window.localStorage.getItem("emailForRegistration"));
+  }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     //validation
-    if(!email || !password) {
-      toast.error('Email and password is required')
-      return
-    } 
-
-    if(password.length < 6) {
-      toast.error('Password must be at least 6 characters long')
-      return 
+    if (!email || !password) {
+      toast.error("Email and password is required");
+      return;
     }
-    
-   try {
-     const result = auth.signInWithEmailLink(email, window.location.href)
-     
-     if((await result).user.emailVerified) {
-       //remove user email from localstorage
-       window.localStorage.removeItem('emailForRegistration')
-       //get user id token
-       let user = auth.currentUser
-       await user.updatePassword(password)
-       const idTokenResult = await user.getIdTokenResult()
-       //redux store
-       console.log('user', user, 'idTokenResult', idTokenResult);
-       //redirect
-       history.push('/')
-     }
-   } catch (error) {
-     console.log(error);
-     toast.error(error.message)
-   }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      const result = auth.signInWithEmailLink(email, window.location.href);
+
+      if ((await result).user.emailVerified) {
+        //remove user email from localstorage
+        window.localStorage.removeItem("emailForRegistration");
+        //get user id token
+        let user = auth.currentUser;
+        await user.updatePassword(password);
+        const idTokenResult = await user.getIdTokenResult();
+        //redux store
+        console.log("user", user, "idTokenResult", idTokenResult);
+        //redirect
+        history.push("/");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
   };
 
   const completeRegistrationForm = () => (
     <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        className="form-control"
-        value={email}
-        disabled
-      />
+      <input type="email" className="form-control" value={email} disabled />
       <input
         type="password"
         className="form-control"
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
         autoFocus
-        placeholder='Enter your password'
+        placeholder="Enter your password"
       />
-      <br/>
-      <button type='submit' className='btn btn-raised'>Complete Registration</button>
+      <br />
+      <button type="submit" className="btn btn-raised">
+        Complete Registration
+      </button>
     </form>
   );
 

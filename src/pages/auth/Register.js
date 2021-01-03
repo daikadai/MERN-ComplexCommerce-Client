@@ -29,6 +29,7 @@ const Register = () => {
         type="email"
         className="form-control"
         value={email}
+        placeholder='Your email'
         onChange={(e) => setEmail(e.target.value)}
         autoFocus
       />
@@ -42,6 +43,7 @@ const Register = () => {
       <div className="row">
         <div className="col-md-6 offset-md-3">
           <h4>Register</h4>
+          <br/>
           {registerForm()}
         </div>
       </div>

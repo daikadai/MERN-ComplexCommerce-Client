@@ -5,6 +5,8 @@ import { Button } from "antd";
 import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { createOrUpdateUser } from "../../functions/auth";
+
 
 const Login = ({ history }) => {
   const [email, setEmail] = useState("daikadai96@gmail.com");
@@ -30,13 +32,23 @@ const Login = ({ history }) => {
       //  console.log(result);
       const { user } = result;
       const idTokenResult = await user.getIdTokenResult();
-      dispatch({
-        type: "LOGGED_IN_USER",
-        payload: {
-          email: user.email,
-          token: idTokenResult.token,
-        },
-      });
+
+      createOrUpdateUser(idTokenResult.token)
+        .then(
+          res => {
+            dispatch({
+              type: "LOGGED_IN_USER",
+              payload: {
+                name: res.data.name,
+                role: res.data.role,
+                email: res.data.email,
+                token: idTokenResult.token,
+                _id: res.data._id
+              },
+            });
+          }
+        )
+        .catch()
 
       history.push("/");
     } catch (error) {
@@ -51,13 +63,22 @@ const Login = ({ history }) => {
       .then(async (result) => {
         const { user } = result;
         const idTokenResult = await user.getIdTokenResult();
-        dispatch({
-          type: "LOGGED_IN_USER",
-          payload: {
-            email: user.email,
-            token: idTokenResult.token,
-          },
-        });
+        createOrUpdateUser(idTokenResult.token)
+        .then(
+          res => {
+            dispatch({
+              type: "LOGGED_IN_USER",
+              payload: {
+                name: res.data.name,
+                role: res.data.role,
+                email: res.data.email,
+                token: idTokenResult.token,
+                _id: res.data._id
+              },
+            });
+          }
+        )
+        .catch()
         history.push("/");
       })
       .catch(err => {

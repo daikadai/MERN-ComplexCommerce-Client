@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import { auth } from "./firebase";
 import { useDispatch } from 'react-redux'
 import ForgotPassword from './pages/auth/ForgotPassword';
+import { currentUser } from './functions/auth';
 
 
 function App() {
@@ -21,13 +22,22 @@ function App() {
         const idTokenResult = await user.getIdTokenResult()
         console.log('user', user);
 
-        dispatch({
-          type: 'LOGGED_IN_USER',
-          payload: {
-            email: user.email,
-            token: idTokenResult.token
+        currentUser(idTokenResult.token)
+        .then(
+          res => {
+            dispatch({
+              type: "LOGGED_IN_USER",
+              payload: {
+                name: res.data.name,
+                role: res.data.role,
+                email: res.data.email,
+                token: idTokenResult.token,
+                _id: res.data._id
+              },
+            });
           }
-        })
+        )
+        .catch(err => console.log(err))
       }
     })
 
